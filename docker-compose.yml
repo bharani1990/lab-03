@@ -1,0 +1,46 @@
+version: '3'
+
+services:
+  jupyter:
+    container_name: jupyter_front
+    image: jupyter/minimal-notebook
+    ports:
+      - "8888:8888"
+    networks:
+      - front-tier
+      - back-tier
+    volumes:
+      - .:/home/jovyan/work
+    depends_on:
+      - db
+    command: [ 'jupyter', 'lab', '--allow-root' ]
+      
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - POSTGRES_HOST=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=mydb
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      
+  db:
+    container_name: postgres_back
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    networks:
+      - back-tier
+    volumes: 
+      - data:/data/db
+
+networks:
+  front-tier:
+  back-tier:
+
+volumes:
+  data:
+
+
